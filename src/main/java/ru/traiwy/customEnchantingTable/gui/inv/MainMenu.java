@@ -4,18 +4,24 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import ru.traiwy.customEnchantingTable.CustomEnchantingTable;
 import ru.traiwy.customEnchantingTable.gui.MenuTable;
+import ru.traiwy.customEnchantingTable.util.BookshelfPowerCalculator;
 import ru.traiwy.customEnchantingTable.util.ItemUtil;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,10 +60,13 @@ public class MainMenu implements MenuTable{
     private final Inventory inventory;
     private final JavaPlugin plugin;
 
+    private int currentLevel;
+    private int bookshelfCount;
+
+
     public MainMenu(JavaPlugin plugin){
         this.plugin = plugin;
         inventory = Bukkit.createInventory(this, 54, "Enchanting item");
-        build();
 
     }
     @Override
@@ -71,12 +80,22 @@ public class MainMenu implements MenuTable{
                 .decoration(TextDecoration.ITALIC, false)
                 .decoration(TextDecoration.BOLD, true).children();
 
+        final List<Component> loreBookShelf = List.of(
+            Component.text("Количество полок: " + bookshelfCount)
+                .decoration(TextDecoration.ITALIC, false)
+                .decoration(TextDecoration.BOLD, true),
+            Component.text("Уровень стола: " + currentLevel)
+                .decoration(TextDecoration.ITALIC, false)
+                .decoration(TextDecoration.BOLD, true));
+
+
+
         Map<Character, ItemStack> item = new HashMap<>();
         item.put('_', ItemUtil.createItem(BLACK_STAINED_GLASS_PANE, null, null ));
         item.put('n', null);
         item.put('d', ItemUtil.createItem(GRAY_DYE, textName, lore));
         item.put('t', ItemUtil.createItem(ENCHANTING_TABLE, textName, lore));
-        item.put('b', ItemUtil.createItem(BOOKSHELF, textName, lore));
+        item.put('b', ItemUtil.createItem(BOOKSHELF, textName, loreBookShelf));
         item.put('a', ItemUtil.createItem(BARRIER, textName, lore));
         item.put('c', ItemUtil.createItem(BOOK, textName, lore));
         item.put('h', ItemUtil.createItem(HOPPER, textName, lore));
@@ -95,8 +114,10 @@ public class MainMenu implements MenuTable{
     }
 
 
-    @Override
-    public void open(Player player) {
+    public void open(Player player, int levelTable, int countBookShelf) {
+        this.currentLevel = levelTable;
+        this.bookshelfCount = countBookShelf;
+        build();
         player.openInventory(inventory);
     }
 
@@ -114,29 +135,45 @@ public class MainMenu implements MenuTable{
         final Inventory inventoryClick = getClickInventory(itemInv);
 
 
-        if(inventoryClick != null){
+        if (inventoryClick != null) {
             player.openInventory(inventoryClick);
             return;
-        }else{
+        } else {
             player.sendMessage("Инвентори null");
         }
 
 
         Bukkit.getScheduler().runTask(plugin, () -> {
             final ItemStack item = inv.getItem(BOOK_SLOT);
-            player.sendMessage("Предмет: " + item);
-            if (item != null && item.getType() != AIR) {
-                player.sendMessage("1");
-                for (int i : materialAir) {
-                    inv.setItem(i, newItem);
+
+            if (item == null || item.getType() == Material.AIR) {
+                for (int slot : materialAir) {
+                    inv.setItem(slot, null);
                 }
-
-            } else {
                 build();
+                return;
             }
-        });
-        ;
 
+            List<Enchantment> enchant = getAllPossibleEnchantment(item);
+            if (enchant.isEmpty()) return;
+
+            player.sendMessage("Предмет: " + item);
+            player.sendMessage("1");
+            if (!canEnchantItem(item)) return;
+
+            for (int slot : materialAir) {
+                inv.setItem(slot, null);
+            }
+            for (int i = 0; i < enchant.size() && i < materialAir.length; i++) {
+                Enchantment enchantment = enchant.get(i);
+                int slot = materialAir[i];
+
+                ItemStack book = createEnchantmentBook(enchantment);
+                inv.setItem(slot, book);
+            }
+
+
+        });
     }
 
     @Override
@@ -145,13 +182,7 @@ public class MainMenu implements MenuTable{
     }
 
     public Inventory getClickInventory(ItemStack itemStack) {
-
-        if (itemStack == null) {
-            Bukkit.getLogger().info("Итем из нул");
-            return null;
-        }
-        Bukkit.getLogger().info("" + itemStack.getType());
-
+        if(itemStack == null) return null;
         switch (itemStack.getType()) {
             case BOOK:
                 return CustomEnchantingTable.getInstance().getGuideMenu().getInventory();
@@ -160,5 +191,51 @@ public class MainMenu implements MenuTable{
         }
     }
 
+    private boolean canEnchantItem(ItemStack item){
+        if(item == null) return false;
+        final Material material = item.getType();
+        for(EnchantmentTarget target : EnchantmentTarget.values()){
+            if(target.includes(material)) return true;
+        }
+        return false;
+    }
+
+    private List<Enchantment> getAllPossibleEnchantment(ItemStack item){
+        List<Enchantment> possibleEnchantments  = new ArrayList<>();
+        if(item == null || item.getType() == Material.AIR) return possibleEnchantments;
+
+        Map<Enchantment, Integer> existingEnchants = new HashMap<>();
+         if (item.hasItemMeta() && item.getItemMeta().hasEnchants()) {
+            existingEnchants = item.getEnchantments();
+        }
+
+        for(Enchantment enchantment : Enchantment.values()){
+            if(!enchantment.canEnchantItem(item)) continue;
+
+            if(existingEnchants.containsKey(enchantment)) continue;
+
+            boolean hasConflict = false;
+            for(Enchantment existing : existingEnchants.keySet()){
+                if(enchantment.conflictsWith(existing)){
+                    hasConflict = true;
+                    break;
+                }
+            }
+            if(hasConflict) continue;
+
+            possibleEnchantments.add(enchantment);
+        }
+
+        return possibleEnchantments;
+    }
+
+    private ItemStack createEnchantmentBook(Enchantment enchantment){
+        final ItemStack item = new ItemStack(ENCHANTED_BOOK);
+        EnchantmentStorageMeta meta = (EnchantmentStorageMeta) item.getItemMeta();
+
+        meta.addStoredEnchant(enchantment, 1, true);
+        item.setItemMeta(meta);
+        return item;
+    }
 }
 

@@ -9,6 +9,7 @@ import ru.traiwy.customEnchantingTable.gui.ClickService;
 import ru.traiwy.customEnchantingTable.gui.inv.GuideMenu;
 import ru.traiwy.customEnchantingTable.gui.inv.MainMenu;
 import ru.traiwy.customEnchantingTable.manager.ItemManager;
+import ru.traiwy.customEnchantingTable.util.BookshelfPowerCalculator;
 
 @Getter
 public final class CustomEnchantingTable extends JavaPlugin {
@@ -23,14 +24,14 @@ public final class CustomEnchantingTable extends JavaPlugin {
         instance = this;
         final ConfigData configData = new ConfigData();
 
-         final MainMenu mainMenu = new MainMenu(this);
+        final MainMenu mainMenu = new MainMenu(this);
         this.guideMenu = new GuideMenu(configData);
 
         final ItemManager itemManager = new ItemManager();
+        final BookshelfPowerCalculator calculator = new BookshelfPowerCalculator();
 
 
-
-        getServer().getPluginManager().registerEvents(new EnchantTableOpenListener(mainMenu), this);
+        getServer().getPluginManager().registerEvents(new EnchantTableOpenListener(mainMenu, calculator), this);
         getServer().getPluginManager().registerEvents(new ClickService(), this);
         getCommand("giveTable").setExecutor(new GiveCommand(itemManager));
 
