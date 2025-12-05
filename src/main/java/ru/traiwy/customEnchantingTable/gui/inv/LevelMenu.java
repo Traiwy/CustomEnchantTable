@@ -10,6 +10,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import ru.traiwy.customEnchantingTable.CustomEnchantingTable;
 import ru.traiwy.customEnchantingTable.gui.MenuTable;
 import ru.traiwy.customEnchantingTable.gui.inv.main.EnchantLevelManager;
 import ru.traiwy.customEnchantingTable.gui.inv.main.MainMenu;
@@ -31,7 +32,7 @@ public class LevelMenu implements MenuTable {
             "_n__nnn__",
             "_t__nnn__",
             "_________",
-            "___bac___"
+            "d__bac___"
     };
 
     Inventory inventory;
@@ -69,6 +70,7 @@ public class LevelMenu implements MenuTable {
         items.put('b', ItemUtil.createItem(BOOKSHELF, textName, lore));
         items.put('a', ItemUtil.createItem(BARRIER, textName, lore));
         items.put('c', ItemUtil.createItem(BOOK, textName, lore));
+        items.put('d', ItemUtil.createItem(ARROW, textName, lore));
 
         int slot = 0;
         for (String row : inv) {
@@ -99,9 +101,16 @@ public class LevelMenu implements MenuTable {
 
          final int slot = event.getRawSlot();
 
+
+
          if(slot < top.getSize()){
              if(slot == MainMenu.ITEM_SLOT){
                  event.setCancelled(false);
+             }
+
+             if(slot == 45){
+                MainMenu mainMenu = CustomEnchantingTable.instance.getMenu(player);
+                mainMenu.open(player);
              }
          }
     }

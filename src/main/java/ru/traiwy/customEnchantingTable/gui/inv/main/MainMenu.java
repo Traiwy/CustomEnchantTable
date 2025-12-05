@@ -19,18 +19,12 @@ import ru.traiwy.customEnchantingTable.util.ItemUtil;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.bukkit.Material.*;
 
 public class MainMenu implements MenuTable {
-    //p - panel
-    //n - null
-    // d - dye
-    //t - enchant table
-    //b - bookshelf
-    //a - barriers
-    //c - book
-    // h - hopper
+
     public static final String[] inv = {
             "_________",
             "_________",
@@ -48,13 +42,15 @@ public class MainMenu implements MenuTable {
 
     private int currentLevel;
     private int bookshelfCount;
+    private final ItemStack targetItem;
 
-
-    public MainMenu(JavaPlugin plugin) {
+    public MainMenu(JavaPlugin plugin, ItemStack targetItem) {
         this.plugin = plugin;
+        this.targetItem = targetItem;
         inventory = Bukkit.createInventory(this, 54, "Enchanting item");
-
+        build();
     }
+
 
     @Override
     public void build() {
@@ -97,18 +93,23 @@ public class MainMenu implements MenuTable {
                 slot++;
             }
         }
+
+        Bukkit.getLogger().info("Предмет: " + targetItem);
+        inventory.setItem(MainMenu.ITEM_SLOT, targetItem);
     }
 
 
     public void open(Player player, int levelTable, int countBookShelf) {
         this.currentLevel = levelTable;
         this.bookshelfCount = countBookShelf;
-        build();
+        player.openInventory(inventory);
+    }
+
+    public void open(Player player) {
         player.openInventory(inventory);
     }
 
     private static int[] materialAir = {12, 13, 14, 15, 16, 21, 22, 23, 24, 25, 30, 31, 32, 33, 34};
-
 
 
     @Override
@@ -120,7 +121,7 @@ public class MainMenu implements MenuTable {
 
         final int slot = event.getRawSlot();
         final ItemStack clickedItem = event.getCurrentItem();
-        if(clickedItem == null) player.sendMessage("null");
+        if (clickedItem == null) player.sendMessage("null");
 
         if (slot < top.getSize()) {
             if (slot == ITEM_SLOT) {
@@ -157,7 +158,8 @@ public class MainMenu implements MenuTable {
             if (clickedItem.getType() == Material.ENCHANTED_BOOK) {
                 LevelMenu levelMenu = new LevelMenu(itemInBookSlot);
                 Inventory levelInv = levelMenu.getInventory();
-                if(levelMenu == null) return;
+                CustomEnchantingTable.getInstance().setMenu(player, this);
+                if (levelMenu == null) return;
 
                 enchantLevelManager.updateDyeLevels(clickedItem, levelInv);
                 levelMenu.open(player);
@@ -187,4 +189,6 @@ public class MainMenu implements MenuTable {
     }
 
 }
+
+
 
