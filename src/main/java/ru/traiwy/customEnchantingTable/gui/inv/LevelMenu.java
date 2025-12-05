@@ -5,14 +5,16 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import ru.traiwy.customEnchantingTable.CustomEnchantingTable;
 import ru.traiwy.customEnchantingTable.gui.MenuTable;
-import ru.traiwy.customEnchantingTable.gui.inv.main.EnchantLevelManager;
 import ru.traiwy.customEnchantingTable.gui.inv.main.MainMenu;
 import ru.traiwy.customEnchantingTable.util.ItemUtil;
 
@@ -37,10 +39,11 @@ public class LevelMenu implements MenuTable {
 
     Inventory inventory;
     ItemStack item;
+    ItemStack bookItem;
 
 
-
-    public LevelMenu(ItemStack item){
+    public LevelMenu(ItemStack item, ItemStack bookItem){
+        this.bookItem = bookItem;
         this.inventory = Bukkit.createInventory(this, 54, "Enchanting item -> Levels");
        this.item = item.clone();
        build();
@@ -93,25 +96,51 @@ public class LevelMenu implements MenuTable {
     }
 
     @Override
-    public void click(InventoryClickEvent event){
-        if(!(event.getWhoClicked() instanceof Player player)) return;
+    public void click(InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof Player player)) return;
 
         final Inventory top = event.getView().getTopInventory();
-        if(!(top.getHolder() instanceof MenuTable)) return;
+        if (!(top.getHolder() instanceof MenuTable)) return;
 
-         final int slot = event.getRawSlot();
+        final int slot = event.getRawSlot();
+
+        if (slot < top.getSize()) {
+            if (slot == MainMenu.ITEM_SLOT) {
+                event.setCancelled(false);
+            } else {
+                event.setCancelled(true);
+                switch (slot) {
+                    case 45 -> CustomEnchantingTable.instance.getMenu(player).open(player);
+                    case 22 -> applyEnchantment(player, 1);
+                    case 23 -> applyEnchantment(player, 2);
+                    case 24 -> applyEnchantment(player, 3);
+                    case 31 -> applyEnchantment(player, 4);
+                    case 32 -> applyEnchantment(player, 5);
+                    case 33 -> applyEnchantment(player, 6);
+                }
+            }
 
 
+        }
 
-         if(slot < top.getSize()){
-             if(slot == MainMenu.ITEM_SLOT){
-                 event.setCancelled(false);
-             }
+    }
 
-             if(slot == 45){
-                MainMenu mainMenu = CustomEnchantingTable.instance.getMenu(player);
-                mainMenu.open(player);
-             }
-         }
+    private void applyEnchantment(Player player, int level) {
+        player.sendMessage("1");
+        EnchantmentStorageMeta bookMeta = (EnchantmentStorageMeta) bookItem.getItemMeta();
+        if (bookMeta.getStoredEnchants().isEmpty()) return;
+
+        Map.Entry<Enchantment, Integer> entry = bookMeta.getStoredEnchants().entrySet().iterator().next();
+        Enchantment enchant = entry.getKey();
+
+        ItemMeta meta = item.getItemMeta();
+        meta.addEnchant(enchant, level, true);
+        item.setItemMeta(meta);
+
+        CustomEnchantingTable.instance.updateItem(player, item);
+
+        MainMenu menu = CustomEnchantingTable.instance.getMenu(player);
+        menu.open(player);
+
     }
 }

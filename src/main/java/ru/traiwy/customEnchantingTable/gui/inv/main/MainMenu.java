@@ -95,7 +95,7 @@ public class MainMenu implements MenuTable {
         }
 
         Bukkit.getLogger().info("Предмет: " + targetItem);
-        inventory.setItem(MainMenu.ITEM_SLOT, targetItem);
+        //inventory.setItem(MainMenu.ITEM_SLOT, targetItem);
     }
 
 
@@ -106,6 +106,15 @@ public class MainMenu implements MenuTable {
     }
 
     public void open(Player player) {
+
+        ItemStack saved = CustomEnchantingTable.instance.getItem(player);
+
+        if (saved != null) {
+            inventory.setItem(ITEM_SLOT, saved.clone());
+        } else if (targetItem != null) {
+            inventory.setItem(ITEM_SLOT, targetItem.clone());
+        }
+
         player.openInventory(inventory);
     }
 
@@ -156,7 +165,7 @@ public class MainMenu implements MenuTable {
             }
 
             if (clickedItem.getType() == Material.ENCHANTED_BOOK) {
-                LevelMenu levelMenu = new LevelMenu(itemInBookSlot);
+                LevelMenu levelMenu = new LevelMenu(itemInBookSlot, clickedItem);
                 Inventory levelInv = levelMenu.getInventory();
                 CustomEnchantingTable.getInstance().setMenu(player, this);
                 if (levelMenu == null) return;

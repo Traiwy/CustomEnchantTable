@@ -2,6 +2,7 @@ package ru.traiwy.customEnchantingTable;
 
 import lombok.Getter;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import ru.traiwy.customEnchantingTable.command.GiveCommand;
 import ru.traiwy.customEnchantingTable.data.ConfigData;
@@ -63,5 +64,16 @@ public final class CustomEnchantingTable extends JavaPlugin {
 
     public void setMenu(Player p, MainMenu menu) {
         menus.put(p.getUniqueId(), menu);
+    }
+
+
+    private final Map<UUID, ItemStack> items = new HashMap<>();
+
+    public void updateItem(Player player, ItemStack item) {
+        items.put(player.getUniqueId(), item.clone());
+    }
+
+    public ItemStack getItem(Player player) {
+        return items.get(player.getUniqueId());
     }
 }
