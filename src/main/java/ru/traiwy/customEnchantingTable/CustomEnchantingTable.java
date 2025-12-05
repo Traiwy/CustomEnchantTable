@@ -13,6 +13,7 @@ import ru.traiwy.customEnchantingTable.gui.inv.LevelMenu;
 import ru.traiwy.customEnchantingTable.gui.inv.main.EnchantLevelManager;
 import ru.traiwy.customEnchantingTable.gui.inv.main.EnchantManager;
 import ru.traiwy.customEnchantingTable.gui.inv.main.MainMenu;
+import ru.traiwy.customEnchantingTable.manager.ConfigManager;
 import ru.traiwy.customEnchantingTable.manager.ItemManager;
 import ru.traiwy.customEnchantingTable.util.BookshelfPowerCalculator;
 
@@ -36,13 +37,16 @@ public final class CustomEnchantingTable extends JavaPlugin {
         instance = this;
         enchantLevelManager = new EnchantLevelManager();
         enchantManager = new EnchantManager();
-        final ConfigData configData = new ConfigData();
+         final ConfigManager configManager = new ConfigManager(this);
+        final ConfigData configData = configManager.getConfigData();
 
 
         this.guideMenu = new GuideMenu(configData);
 
+
         final ItemManager itemManager = new ItemManager();
         final BookshelfPowerCalculator calculator = new BookshelfPowerCalculator();
+
 
 
         getServer().getPluginManager().registerEvents(new EnchantTableOpenListener(calculator, this), this);
