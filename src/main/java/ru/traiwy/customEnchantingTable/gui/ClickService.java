@@ -17,7 +17,5 @@ public class ClickService implements Listener {
         if (!(top.getHolder() instanceof MenuTable menu)) return;
 
         menu.click(event);
-
-
     }
 }

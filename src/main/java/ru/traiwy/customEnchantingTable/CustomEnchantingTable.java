@@ -7,7 +7,9 @@ import ru.traiwy.customEnchantingTable.data.ConfigData;
 import ru.traiwy.customEnchantingTable.event.EnchantTableOpenListener;
 import ru.traiwy.customEnchantingTable.gui.ClickService;
 import ru.traiwy.customEnchantingTable.gui.inv.GuideMenu;
-import ru.traiwy.customEnchantingTable.gui.inv.MainMenu;
+import ru.traiwy.customEnchantingTable.gui.inv.main.EnchantLevelManager;
+import ru.traiwy.customEnchantingTable.gui.inv.main.EnchantManager;
+import ru.traiwy.customEnchantingTable.gui.inv.main.MainMenu;
 import ru.traiwy.customEnchantingTable.manager.ItemManager;
 import ru.traiwy.customEnchantingTable.util.BookshelfPowerCalculator;
 
@@ -18,10 +20,14 @@ public final class CustomEnchantingTable extends JavaPlugin {
     public static CustomEnchantingTable instance;
 
     private GuideMenu guideMenu;
+    private EnchantLevelManager enchantLevelManager;
+    private EnchantManager enchantManager;
 
     @Override
     public void onEnable() {
         instance = this;
+        enchantLevelManager = new EnchantLevelManager();
+        enchantManager = new EnchantManager();
         final ConfigData configData = new ConfigData();
 
         final MainMenu mainMenu = new MainMenu(this);

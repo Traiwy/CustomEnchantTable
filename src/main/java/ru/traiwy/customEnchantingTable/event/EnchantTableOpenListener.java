@@ -11,9 +11,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import ru.traiwy.customEnchantingTable.gui.inv.MainMenu;
+import ru.traiwy.customEnchantingTable.gui.inv.main.MainMenu;
 import ru.traiwy.customEnchantingTable.util.BookshelfPowerCalculator;
 
 import java.util.Random;
