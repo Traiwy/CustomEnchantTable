@@ -5,20 +5,17 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.EnchantmentStorageMeta;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import ru.traiwy.customEnchantingTable.CustomEnchantingTable;
 import ru.traiwy.customEnchantingTable.gui.MenuTable;
+import ru.traiwy.customEnchantingTable.gui.inv.LevelMenu;
 import ru.traiwy.customEnchantingTable.util.ItemUtil;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +40,7 @@ public class MainMenu implements MenuTable {
             "___bach__"
     };
 
-    private final int BOOK_SLOT = 19;
+    public static final int ITEM_SLOT = 19;
     private final Inventory inventory;
     private final JavaPlugin plugin;
     private final EnchantLevelManager enchantLevelManager = CustomEnchantingTable.getInstance().getEnchantLevelManager();
@@ -126,7 +123,7 @@ public class MainMenu implements MenuTable {
         if(clickedItem == null) player.sendMessage("null");
 
         if (slot < top.getSize()) {
-            if (slot == BOOK_SLOT) {
+            if (slot == ITEM_SLOT) {
                 event.setCancelled(false);
             } else {
                 event.setCancelled(true);
@@ -140,7 +137,7 @@ public class MainMenu implements MenuTable {
         }
 
         Bukkit.getScheduler().runTask(plugin, () -> {
-            final ItemStack itemInBookSlot = top.getItem(BOOK_SLOT);
+            final ItemStack itemInBookSlot = top.getItem(ITEM_SLOT);
 
             if (itemInBookSlot == null || itemInBookSlot.getType() == Material.AIR) {
                 clearSlots(top, materialAir);
@@ -158,7 +155,12 @@ public class MainMenu implements MenuTable {
             }
 
             if (clickedItem.getType() == Material.ENCHANTED_BOOK) {
-                enchantLevelManager.updateDyeLevels(clickedItem, top);
+                LevelMenu levelMenu = new LevelMenu(itemInBookSlot);
+                Inventory levelInv = levelMenu.getInventory();
+                if(levelMenu == null) return;
+
+                enchantLevelManager.updateDyeLevels(clickedItem, levelInv);
+                levelMenu.open(player);
             }
         });
     }

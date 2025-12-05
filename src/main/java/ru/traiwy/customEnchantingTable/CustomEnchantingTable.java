@@ -7,6 +7,7 @@ import ru.traiwy.customEnchantingTable.data.ConfigData;
 import ru.traiwy.customEnchantingTable.event.EnchantTableOpenListener;
 import ru.traiwy.customEnchantingTable.gui.ClickService;
 import ru.traiwy.customEnchantingTable.gui.inv.GuideMenu;
+import ru.traiwy.customEnchantingTable.gui.inv.LevelMenu;
 import ru.traiwy.customEnchantingTable.gui.inv.main.EnchantLevelManager;
 import ru.traiwy.customEnchantingTable.gui.inv.main.EnchantManager;
 import ru.traiwy.customEnchantingTable.gui.inv.main.MainMenu;

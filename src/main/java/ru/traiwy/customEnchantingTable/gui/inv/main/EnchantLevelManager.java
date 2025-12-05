@@ -17,7 +17,6 @@ import static org.bukkit.Material.GRAY_DYE;
 
 public class EnchantLevelManager {
     private static int[] materialDye = {22, 23, 24, 31, 32, 33};
-    private static int[] panelGray = {12,13,14,15,16,21,25,30,34};
 
     public List<Integer> getLevelsEnchant(@NotNull Enchantment enchantment) {
         final List<Integer> levels = new ArrayList<>();
@@ -55,9 +54,6 @@ public class EnchantLevelManager {
         int index = 0;
         for (int slot : materialDye) {
             inv.setItem(slot, null);
-        }
-        for(int slot : panelGray){
-            inv.setItem(slot, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
         }
 
         for(Map.Entry<Enchantment, Integer> enty : meta.getStoredEnchants().entrySet()){
