@@ -20,7 +20,6 @@ import ru.traiwy.customEnchantingTable.util.ItemUtil;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import static org.bukkit.Material.*;
 
@@ -168,7 +167,10 @@ public class MainMenu implements MenuTable {
                 LevelMenu levelMenu = new LevelMenu(itemInBookSlot, clickedItem, configData);
                 Inventory levelInv = levelMenu.getInventory();
                 CustomEnchantingTable.getInstance().setMenu(player, this);
+                inventory.setItem(ITEM_SLOT, null);
                 enchantLevelManager.updateDyeLevels(clickedItem, levelInv);
+
+
                 levelMenu.open(player);
             }
         });

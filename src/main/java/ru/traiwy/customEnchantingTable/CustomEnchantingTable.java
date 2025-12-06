@@ -42,10 +42,7 @@ public final class CustomEnchantingTable extends JavaPlugin {
         enchantManager = new EnchantManager();
 
 
-
-
         this.guideMenu = new GuideMenu(configData);
-
 
         final ItemManager itemManager = new ItemManager();
         final BookshelfPowerCalculator calculator = new BookshelfPowerCalculator();
@@ -55,6 +52,7 @@ public final class CustomEnchantingTable extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new EnchantTableOpenListener(calculator, this, enchantLevelManager, configData), this);
         getServer().getPluginManager().registerEvents(new ClickService(), this);
         getServer().getPluginManager().registerEvents(new InventoryCloseListener(), this);
+        getServer().getPluginManager().registerEvents(guideMenu, this);
         getCommand("giveTable").setExecutor(new GiveCommand(itemManager));
 
 

@@ -2,6 +2,7 @@ package ru.traiwy.customEnchantingTable.data;
 
 
 import lombok.Data;
+import net.kyori.adventure.text.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,13 +16,12 @@ public class ConfigData {
     @Data
     public static class GuideBook {
         public List<GuideBookItem> books = new ArrayList<>();
+    }
 
-        public GuideBook() {
-            GuideBookItem item = new GuideBookItem();
-            item.setName("Sharpness VI");
-            item.setLore(List.of("Описание", "ещё строка"));
-            books.add(item);
-        }
+    @Data
+    public static class GuideBookItem {
+        private String name;
+        public List<String> lore;
     }
 
     @Data
@@ -36,12 +36,6 @@ public class ConfigData {
         private List<Integer> levels = new ArrayList<>();
         private List<Integer> costExp = new ArrayList<>();
         private List<Integer> requiredTableLevel = new ArrayList<>();
-    }
-
-    @Data
-    public static class GuideBookItem {
-        private String name;
-        public List<String> lore;
     }
 
 }

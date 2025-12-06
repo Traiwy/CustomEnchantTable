@@ -5,8 +5,11 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import ru.traiwy.customEnchantingTable.data.ConfigData;
@@ -20,7 +23,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class GuideMenu implements MenuTable {
+public class GuideMenu implements InventoryHolder, Listener {
     public static final int[] GRAY_PANEL = {0, 1, 2, 3, 5, 6, 7, 8, 9, 17, 18, 26, 27, 35, 36, 44, 45, 46, 47, 51, 52, 53};
 
     private int currentPage = 0;
@@ -58,7 +61,6 @@ public class GuideMenu implements MenuTable {
         build();
     }
 
-    @Override
     public void build() {
         //inventory.clear();
 
@@ -106,12 +108,20 @@ public class GuideMenu implements MenuTable {
         }
     }
 
-    @Override
+    @EventHandler
     public void click(InventoryClickEvent event) {
-        event.setCancelled(true);
+        if (!(event.getWhoClicked() instanceof Player)) return;
+
+        final Inventory top = event.getView().getTopInventory();
+        if (!(top.getHolder() instanceof GuideMenu)) return;
 
         final int slot = event.getRawSlot();
-         Player player = (Player) event.getWhoClicked();
+
+        if (slot < top.getSize()) {
+            event.setCancelled(true);
+        }
+
+        Player player = (Player) event.getWhoClicked();
 
         switch (slot) {
             case 53 -> {
