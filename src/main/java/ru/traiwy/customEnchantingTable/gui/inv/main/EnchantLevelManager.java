@@ -1,5 +1,7 @@
 package ru.traiwy.customEnchantingTable.gui.inv.main;
 
+import lombok.AllArgsConstructor;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
@@ -8,6 +10,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
+import ru.traiwy.customEnchantingTable.event.EnchantTableOpenListener;
+import ru.traiwy.customEnchantingTable.util.BookshelfPowerCalculator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +21,14 @@ import static org.bukkit.Material.GRAY_DYE;
 
 public class EnchantLevelManager {
     private static int[] materialDye = {22, 23, 24, 31, 32, 33};
+
+    private int tableLevel;
+    private int bookshelfCount;
+
+    public void setTableData(int tableLevel, int bookshelfCount) {
+        this.tableLevel = tableLevel;
+        this.bookshelfCount = bookshelfCount;
+    }
 
     public List<Integer> getLevelsEnchant(@NotNull Enchantment enchantment) {
         final List<Integer> levels = new ArrayList<>();
@@ -39,11 +51,21 @@ public class EnchantLevelManager {
     public ItemStack createDye(int level) {
         final ItemStack item = new ItemStack(GRAY_DYE);
         final ItemMeta meta = item.getItemMeta();
-        String name = "Левел: " + level;
-        meta.setDisplayName(name);
+        if (level > tableLevel) {
+            meta.setDisplayName("Левел: " + level);
+            meta.setLore(List.of("Нужен стол уровня " + level));
+        } else {
+            meta.setDisplayName("Левел: " + level);
+            meta.setLore(List.of("Можно зачаровать"));
+        }
 
         item.setItemMeta(meta);
         return item;
+    }
+
+    private boolean isAvailableLevel(int enchantLevel) {
+        int maxAllowedLevel = tableLevel + bookshelfCount / 2;
+        return enchantLevel <= maxAllowedLevel;
     }
 
     public void updateDyeLevels(@NotNull ItemStack item, Inventory inv){

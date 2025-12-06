@@ -94,8 +94,6 @@ public class MainMenu implements MenuTable {
             }
         }
 
-        Bukkit.getLogger().info("Предмет: " + targetItem);
-        //inventory.setItem(MainMenu.ITEM_SLOT, targetItem);
     }
 
 
@@ -126,11 +124,11 @@ public class MainMenu implements MenuTable {
         if (!(event.getWhoClicked() instanceof Player player)) return;
 
         final Inventory top = event.getView().getTopInventory();
-        if (!(top.getHolder() instanceof MenuTable menu)) return;
+        if (!(top.getHolder() instanceof MenuTable)) return;
 
         final int slot = event.getRawSlot();
         final ItemStack clickedItem = event.getCurrentItem();
-        if (clickedItem == null) player.sendMessage("null");
+
 
         if (slot < top.getSize()) {
             if (slot == ITEM_SLOT) {
@@ -152,6 +150,7 @@ public class MainMenu implements MenuTable {
             if (itemInBookSlot == null || itemInBookSlot.getType() == Material.AIR) {
                 clearSlots(top, materialAir);
                 build();
+                player.updateInventory();
                 return;
             }
 
@@ -162,14 +161,13 @@ public class MainMenu implements MenuTable {
                     ItemStack book = manager.createEnchantmentBook(enchantments.get(i));
                     top.setItem(materialAir[i], book);
                 }
+                player.updateInventory();
             }
 
-            if (clickedItem.getType() == Material.ENCHANTED_BOOK) {
+            if (clickedItem != null && clickedItem.getType() == Material.ENCHANTED_BOOK) {
                 LevelMenu levelMenu = new LevelMenu(itemInBookSlot, clickedItem);
                 Inventory levelInv = levelMenu.getInventory();
                 CustomEnchantingTable.getInstance().setMenu(player, this);
-                if (levelMenu == null) return;
-
                 enchantLevelManager.updateDyeLevels(clickedItem, levelInv);
                 levelMenu.open(player);
             }
@@ -196,6 +194,7 @@ public class MainMenu implements MenuTable {
                 return null;
         }
     }
+
 
 }
 

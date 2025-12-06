@@ -49,7 +49,7 @@ public final class CustomEnchantingTable extends JavaPlugin {
 
 
 
-        getServer().getPluginManager().registerEvents(new EnchantTableOpenListener(calculator, this), this);
+        getServer().getPluginManager().registerEvents(new EnchantTableOpenListener(calculator, this, enchantLevelManager), this);
         getServer().getPluginManager().registerEvents(new ClickService(), this);
         getCommand("giveTable").setExecutor(new GiveCommand(itemManager));
 

@@ -35,11 +35,19 @@ public class ConfigData {
         private String name = "sharpness";
         private List<Integer> levels = List.of(1, 2, 3);
         private int costExp = 5;
+
     }
+     @Data
+     public static class LevelConfig{
+        private int level;
+        private int requiredTableLevel;
+     }
 
     @Data
     public static class GuideBookItem {
         private String name;
         public List<String> lore;
     }
+
+
 }

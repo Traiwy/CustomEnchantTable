@@ -126,7 +126,6 @@ public class LevelMenu implements MenuTable {
     }
 
     private void applyEnchantment(Player player, int level) {
-        player.sendMessage("1");
         EnchantmentStorageMeta bookMeta = (EnchantmentStorageMeta) bookItem.getItemMeta();
         if (bookMeta.getStoredEnchants().isEmpty()) return;
 
