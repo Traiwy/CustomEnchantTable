@@ -12,8 +12,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import ru.traiwy.customEnchantingTable.CustomEnchantingTable;
 import ru.traiwy.customEnchantingTable.data.ConfigData;
-import ru.traiwy.customEnchantingTable.gui.MenuTable;
+import ru.traiwy.customEnchantingTable.gui.inv.main.MainMenu;
 import ru.traiwy.customEnchantingTable.util.ItemUtil;
 
 import java.util.ArrayList;
@@ -21,6 +22,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static org.bukkit.Material.LIGHT_BLUE_STAINED_GLASS_PANE;
+import static org.bukkit.Material.ORANGE_STAINED_GLASS_PANE;
 
 @Slf4j
 public class GuideMenu implements InventoryHolder, Listener {
@@ -33,6 +37,8 @@ public class GuideMenu implements InventoryHolder, Listener {
     private Inventory inventory;
     private final ConfigData configData;
 
+    String title = "(%s/2)  Справочник зачарований".replace("%s", String.valueOf(currentPage));
+
     /*
     c - book
     n - null]
@@ -44,18 +50,18 @@ public class GuideMenu implements InventoryHolder, Listener {
     */
 
     public static final String[] inv = {
-            "____c____",
-            "_nnnnnnn_",
-            "_nnnnnnn_",
-            "_nnnnnnn_",
-            "_nnnnnnn_",
-            "___abte__"
+            "ggggcgggg",
+            "gnnnnnnng",
+            "onnnnnnno",
+            "rnnnnnnnr",
+            "gnnnnnnng",
+            "ggggggggr"
     };
 
 
     public GuideMenu(ConfigData configData) {
         this.configData = configData;
-        this.inventory = Bukkit.createInventory(this, 54, "Enchantments Guide page: " + currentPage);
+        this.inventory = Bukkit.createInventory(this, 54, getTitle());
 
         loadEnchantBooks();
         build();
@@ -68,10 +74,12 @@ public class GuideMenu implements InventoryHolder, Listener {
         item.put('_', ItemUtil.createItem(Material.BLACK_STAINED_GLASS_PANE, null, null));
         item.put('n', null);
         item.put('c', ItemUtil.createItem(Material.BOOK, null, null));
-        item.put('a', ItemUtil.createItem(Material.ARROW, null, null));
+        item.put('r', ItemUtil.createItem(Material.ARROW, null, null));
         item.put('b', ItemUtil.createItem(Material.BARRIER, null, null));
         item.put('t', ItemUtil.createItem(Material.OAK_SIGN, null, null));
         item.put('e', ItemUtil.createItem(Material.ENDER_EYE, null, null));
+        item.put('g', ItemUtil.createItem(LIGHT_BLUE_STAINED_GLASS_PANE, null, null));
+        item.put('o', ItemUtil.createItem(ORANGE_STAINED_GLASS_PANE, null, null));
 
 
         int slot = 0;
@@ -88,6 +96,11 @@ public class GuideMenu implements InventoryHolder, Listener {
         }
 
         placePageItems();
+    }
+
+    private String getTitle() {
+        int totalPages = (int) Math.ceil((double) enchantBooks.size() / itemsPage);
+        return String.format("(%d/2)  Справочник зачарований", currentPage + 1);
     }
 
     private void placePageItems() {
@@ -124,7 +137,7 @@ public class GuideMenu implements InventoryHolder, Listener {
         Player player = (Player) event.getWhoClicked();
 
         switch (slot) {
-            case 53 -> {
+            case 35 -> {
                 if ((currentPage + 1) * itemsPage < enchantBooks.size()) {
                     currentPage++;
                     player.sendMessage("" + currentPage);
@@ -132,7 +145,7 @@ public class GuideMenu implements InventoryHolder, Listener {
                     player.openInventory(inventory);
                 }
             }
-            case 45 -> {
+            case 27 -> {
                 if (currentPage > 0) {
                     currentPage--;
                     refresh(player);
@@ -140,8 +153,9 @@ public class GuideMenu implements InventoryHolder, Listener {
                 }
             }
 
-            case 49 -> {
-                player.closeInventory();
+            case 53 -> {
+                MainMenu mainMenu = CustomEnchantingTable.instance.getMenu(player);
+                player.openInventory(mainMenu.getInventory());
             }
         }
     }
@@ -152,8 +166,7 @@ public class GuideMenu implements InventoryHolder, Listener {
     }
 
     public void refresh(Player player) {
-        Inventory newInv = Bukkit.createInventory(this, inventory.getSize(),
-                "Enchantments Guide page: " + currentPage);
+        Inventory newInv = Bukkit.createInventory(this, inventory.getSize(), getTitle());
 
         for (int i = 0; i < inventory.getSize(); i++) {
             newInv.setItem(i, inventory.getItem(i));

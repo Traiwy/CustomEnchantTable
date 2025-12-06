@@ -21,29 +21,31 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.bukkit.Material.*;
+
 
 public class MainMenu implements MenuTable {
 
     public static final String[] inv = {
-            "_________",
-            "_________",
-            "_n___d___",
-            "_t_______",
-            "_________",
-            "___bach__"
+            "ggggggggg",
+            "g_______g",
+            "on___d__o",
+            "ot______o",
+            "g_______g",
+            "gggbacggg"
     };
 
     public static final int ITEM_SLOT = 19;
+
     private final Inventory inventory;
     private final JavaPlugin plugin;
     private final EnchantLevelManager enchantLevelManager = CustomEnchantingTable.getInstance().getEnchantLevelManager();
     private final EnchantManager manager = CustomEnchantingTable.getInstance().getEnchantManager();
-
     private int currentLevel;
     private int bookshelfCount;
     private final ItemStack targetItem;
     private final ConfigData configData;
+
+    private static final int[] materialAir = {12, 13, 14, 15, 16, 21, 22, 23, 24, 25, 30, 31, 32, 33, 34, 39, 40, 41, 42, 43};
 
     public MainMenu(JavaPlugin plugin, ItemStack targetItem, ConfigData configData) {
         this.plugin = plugin;
@@ -54,71 +56,78 @@ public class MainMenu implements MenuTable {
 
     @Override
     public void build() {
-
-        final Component textName = Component.text("name")
-                .decoration(TextDecoration.ITALIC, false)
-                .decoration(TextDecoration.BOLD, true);
-
-        final List<Component> lore = Component.text("lore")
-                .decoration(TextDecoration.ITALIC, false)
-                .decoration(TextDecoration.BOLD, true).children();
-
-        final List<Component> loreBookShelf = List.of(
-                Component.text("Количество полок: " + bookshelfCount)
-                        .decoration(TextDecoration.ITALIC, false)
-                        .decoration(TextDecoration.BOLD, true),
-                Component.text("Уровень стола: " + currentLevel)
-                        .decoration(TextDecoration.ITALIC, false)
-                        .decoration(TextDecoration.BOLD, true));
-
-
-        Map<Character, ItemStack> item = new HashMap<>();
-        item.put('_', ItemUtil.createItem(BLACK_STAINED_GLASS_PANE, null, null));
-        item.put('n', new ItemStack(Material.AIR));
-        item.put('d', ItemUtil.createItem(GRAY_DYE, textName, lore));
-        item.put('t', ItemUtil.createItem(ENCHANTING_TABLE, textName, lore));
-        item.put('b', ItemUtil.createItem(BOOKSHELF, textName, loreBookShelf));
-        item.put('a', ItemUtil.createItem(BARRIER, textName, lore));
-        item.put('c', ItemUtil.createItem(BOOK, textName, lore));
-        item.put('h', ItemUtil.createItem(HOPPER, textName, lore));
-
-        int slot = 0;
-        for (String row : inv) {
-            for (char c : row.toCharArray()) {
-                ItemStack itemStack = item.getOrDefault(c, null);
-                inventory.setItem(slot, itemStack);
-                slot++;
-            }
-            while (slot % 9 != 0) {
-                slot++;
-            }
-        }
-
+        Map<Character, ItemStack> itemMap = createItems();
+        fillPattern(inventory, inv, itemMap);
     }
 
+    private Map<Character, ItemStack> createItems() {
+        Map<Character, ItemStack> items = new HashMap<>();
+
+        Component name = styled("name");
+        List<Component> loreEmpty = styledLore("lore");
+
+        List<Component> loreBookShelf = List.of(
+                styled("Количество полок: " + bookshelfCount),
+                styled("Уровень стола: " + currentLevel)
+        );
+
+        items.put('_', pane(Material.GRAY_STAINED_GLASS_PANE));
+        items.put('n', new ItemStack(Material.AIR));
+        items.put('d', item(Material.GRAY_DYE, name, loreEmpty));
+        items.put('t', item(Material.ENCHANTING_TABLE, Component.text(""), null));
+        items.put('b', item(Material.BOOKSHELF, name, loreBookShelf));
+        items.put('a', item(Material.BARRIER, name, loreEmpty));
+        items.put('c', item(Material.BOOK, name, loreEmpty));
+        items.put('h', item(Material.HOPPER, name, loreEmpty));
+        items.put('g', pane(Material.LIGHT_BLUE_STAINED_GLASS_PANE));
+        items.put('o', pane(Material.ORANGE_STAINED_GLASS_PANE));
+
+        return items;
+    }
+
+    private void fillPattern(Inventory inv, String[] pattern, Map<Character, ItemStack> map) {
+        int slot = 0;
+        for (String row : pattern) {
+            for (char c : row.toCharArray()) {
+                inv.setItem(slot++, map.getOrDefault(c, null));
+            }
+        }
+    }
+
+    private Component styled(String text) {
+        return Component.text(text)
+                .decoration(TextDecoration.ITALIC, false)
+                .decoration(TextDecoration.BOLD, true);
+    }
+
+    private List<Component> styledLore(String text) {
+        return List.of(styled(text));
+    }
+
+    private ItemStack pane(Material material) {
+        return item(material, null, null);
+    }
+
+    private ItemStack item(Material material, Component name, List<Component> lore) {
+        return ItemUtil.createItem(material, name, lore);
+    }
 
     public void open(Player player, int levelTable, int countBookShelf) {
         this.currentLevel = levelTable;
         this.bookshelfCount = countBookShelf;
-         build();
+        build();
         player.openInventory(inventory);
     }
 
     public void open(Player player) {
-
         ItemStack saved = CustomEnchantingTable.instance.getItem(player);
-
         if (saved != null) {
             inventory.setItem(ITEM_SLOT, saved.clone());
         } else if (targetItem != null) {
             inventory.setItem(ITEM_SLOT, targetItem.clone());
         }
-
         player.openInventory(inventory);
     }
-
-    private static int[] materialAir = {12, 13, 14, 15, 16, 21, 22, 23, 24, 25, 30, 31, 32, 33, 34};
-
 
     @Override
     public void click(InventoryClickEvent event) {
@@ -130,19 +139,17 @@ public class MainMenu implements MenuTable {
         final int slot = event.getRawSlot();
         final ItemStack clickedItem = event.getCurrentItem();
 
-
         if (slot < top.getSize()) {
-            if (slot == ITEM_SLOT) {
-                event.setCancelled(false);
-            } else {
-                event.setCancelled(true);
-            }
-        }
+            event.setCancelled(slot != ITEM_SLOT);
 
-        final Inventory inventoryClick = getClickInventory(clickedItem);
-        if (inventoryClick != null) {
-            player.openInventory(inventoryClick);
-            return;
+            switch (slot){
+                case 49 -> player.closeInventory();
+                case 50 -> {
+                    CustomEnchantingTable.getInstance().setMenu(player, this);
+                    player.openInventory(CustomEnchantingTable.getInstance().getGuideMenu().getInventory());
+                    return;
+                }
+            }
         }
 
         Bukkit.getScheduler().runTask(plugin, () -> {
@@ -169,8 +176,6 @@ public class MainMenu implements MenuTable {
                 CustomEnchantingTable.getInstance().setMenu(player, this);
                 inventory.setItem(ITEM_SLOT, null);
                 enchantLevelManager.updateDyeLevels(clickedItem, levelInv);
-
-
                 levelMenu.open(player);
             }
         });
@@ -187,18 +192,4 @@ public class MainMenu implements MenuTable {
         return inventory;
     }
 
-    public Inventory getClickInventory(ItemStack itemStack) {
-        if (itemStack == null) return null;
-        switch (itemStack.getType()) {
-            case BOOK:
-                return CustomEnchantingTable.getInstance().getGuideMenu().getInventory();
-            default:
-                return null;
-        }
-    }
-
-
 }
-
-
-

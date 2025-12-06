@@ -2,7 +2,6 @@ package ru.traiwy.customEnchantingTable.data;
 
 
 import lombok.Data;
-import net.kyori.adventure.text.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +11,7 @@ public class ConfigData {
     private GuideBook guideBook = new GuideBook();
     private MenuItem itemMenu = new MenuItem();
     private List<EnchantData> enchantments = new ArrayList<>();
+
 
     @Data
     public static class GuideBook {

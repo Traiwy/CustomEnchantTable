@@ -31,12 +31,12 @@ public class LevelMenu implements MenuTable {
 
 
     public static final String[] inv = {
-            "_________",
-            "_________",
-            "_n__nnn__",
-            "_t__nnn__",
-            "_________",
-            "d__bac___"
+            "ggggggggg",
+            "g_______g",
+            "on__nnn_o",
+            "ot__nnn_o",
+            "g_______g",
+            "gggbacggd"
     };
 
     Inventory inventory;
@@ -70,13 +70,17 @@ public class LevelMenu implements MenuTable {
 
 
         Map<Character, ItemStack> items = new HashMap<>();
-        items.put('_', ItemUtil.createItem(BLACK_STAINED_GLASS_PANE, null, null));
+        items.put('_', ItemUtil.createItem(GRAY_STAINED_GLASS_PANE, null, null));
         items.put('n', new ItemStack(Material.AIR));
         items.put('t', ItemUtil.createItem(ENCHANTING_TABLE, textName, lore));
         items.put('b', ItemUtil.createItem(BOOKSHELF, textName, lore));
         items.put('a', ItemUtil.createItem(BARRIER, textName, lore));
         items.put('c', ItemUtil.createItem(BOOK, textName, lore));
         items.put('d', ItemUtil.createItem(ARROW, textName, lore));
+
+
+        items.put('g', ItemUtil.createItem(LIGHT_BLUE_STAINED_GLASS_PANE, null, null));
+        items.put('o', ItemUtil.createItem(ORANGE_STAINED_GLASS_PANE, null, null));
 
         int slot = 0;
         for (String row : inv) {
