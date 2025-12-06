@@ -2,12 +2,7 @@ package ru.traiwy.customEnchantingTable.data;
 
 
 import lombok.Data;
-import net.kyori.adventure.text.Component;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
-import ru.traiwy.customEnchantingTable.util.ItemUtil;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,13 +14,20 @@ public class ConfigData {
 
     @Data
     public static class GuideBook {
-        public List<String> books = new ArrayList<>();
+        public List<GuideBookItem> books = new ArrayList<>();
+
+        public GuideBook() {
+            GuideBookItem item = new GuideBookItem();
+            item.setName("Sharpness VI");
+            item.setLore(List.of("Описание", "ещё строка"));
+            books.add(item);
+        }
     }
 
     @Data
     public static class MenuItem {
         private String name = "Название предмета";
-        private List<String> lore = List.of("Описание 1", "Описание 2");
+        private List<EnchantData> lore = List.of();
     }
 
     @Data
@@ -33,5 +35,11 @@ public class ConfigData {
         private String name = "sharpness";
         private List<Integer> levels = List.of(1, 2, 3);
         private int costExp = 5;
+    }
+
+    @Data
+    public static class GuideBookItem {
+        private String name;
+        public List<String> lore;
     }
 }

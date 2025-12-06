@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class GuideMenu implements MenuTable {
@@ -158,24 +159,21 @@ public class GuideMenu implements MenuTable {
     private void loadEnchantBooks() {
         enchantBooks.clear();
 
-        enchantBooks.add(ItemUtil.createItem(Material.ENCHANTED_BOOK,
-                Component.text("Sharpness I"),
-                List.of(Component.text("Увеличивает урон меча"))
-        ));
+        for (ConfigData.GuideBookItem book : configData.getGuideBook().getBooks()) {
+            String name = book.getName();
+            List<String> loreList = book.getLore();
 
-        enchantBooks.add(ItemUtil.createItem(Material.ENCHANTED_BOOK,
-                Component.text("Efficiency V"),
-                List.of(Component.text("Ускоряет добычу блоков"))
-        ));
+            List<Component> lore = loreList.stream()
+                    .map(Component::text)
+                    .collect(Collectors.toList());
 
-        enchantBooks.add(ItemUtil.createItem(Material.ENCHANTED_BOOK,
-                Component.text("Unbreaking III"),
-                List.of(Component.text("Повышает прочность вещей"))
-        ));
-        enchantBooks.add(ItemUtil.createItem(Material.ENCHANTED_BOOK,
-                Component.text("Unbreaking III"),
-                List.of(Component.text("Повышает прочность вещей"))
-        ));
+            ItemStack enchantedBook = ItemUtil.createItem(
+                    Material.ENCHANTED_BOOK,
+                    Component.text(name),
+                    lore
+            );
+             enchantBooks.add(enchantedBook);
+        }
 
     }
 }
