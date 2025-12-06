@@ -7,6 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import ru.traiwy.customEnchantingTable.command.GiveCommand;
 import ru.traiwy.customEnchantingTable.data.ConfigData;
 import ru.traiwy.customEnchantingTable.event.EnchantTableOpenListener;
+import ru.traiwy.customEnchantingTable.event.InventoryCloseListener;
 import ru.traiwy.customEnchantingTable.gui.ClickService;
 import ru.traiwy.customEnchantingTable.gui.inv.GuideMenu;
 import ru.traiwy.customEnchantingTable.gui.inv.LevelMenu;
@@ -35,10 +36,12 @@ public final class CustomEnchantingTable extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
-        enchantLevelManager = new EnchantLevelManager();
+        final ConfigManager configManager = new ConfigManager(this);
+         final ConfigData configData = configManager.getConfigData();
+        enchantLevelManager = new EnchantLevelManager(configData);
         enchantManager = new EnchantManager();
-         final ConfigManager configManager = new ConfigManager(this);
-        final ConfigData configData = configManager.getConfigData();
+
+
 
 
         this.guideMenu = new GuideMenu(configData);
@@ -49,8 +52,9 @@ public final class CustomEnchantingTable extends JavaPlugin {
 
 
 
-        getServer().getPluginManager().registerEvents(new EnchantTableOpenListener(calculator, this, enchantLevelManager), this);
+        getServer().getPluginManager().registerEvents(new EnchantTableOpenListener(calculator, this, enchantLevelManager, configData), this);
         getServer().getPluginManager().registerEvents(new ClickService(), this);
+        getServer().getPluginManager().registerEvents(new InventoryCloseListener(), this);
         getCommand("giveTable").setExecutor(new GiveCommand(itemManager));
 
 

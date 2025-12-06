@@ -33,21 +33,15 @@ public class ConfigData {
     @Data
     public static class EnchantData {
         private String name = "sharpness";
-        private List<Integer> levels = List.of(1, 2, 3);
-        private int costExp = 5;
-
+        private List<Integer> levels = new ArrayList<>();
+        private List<Integer> costExp = new ArrayList<>();
+        private List<Integer> requiredTableLevel = new ArrayList<>();
     }
-     @Data
-     public static class LevelConfig{
-        private int level;
-        private int requiredTableLevel;
-     }
 
     @Data
     public static class GuideBookItem {
         private String name;
         public List<String> lore;
     }
-
 
 }

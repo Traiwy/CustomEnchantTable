@@ -14,8 +14,10 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import ru.traiwy.customEnchantingTable.CustomEnchantingTable;
+import ru.traiwy.customEnchantingTable.data.ConfigData;
 import ru.traiwy.customEnchantingTable.gui.MenuTable;
 import ru.traiwy.customEnchantingTable.gui.inv.main.MainMenu;
+import ru.traiwy.customEnchantingTable.manager.BuyEnchantManager;
 import ru.traiwy.customEnchantingTable.util.ItemUtil;
 
 import java.util.HashMap;
@@ -40,10 +42,12 @@ public class LevelMenu implements MenuTable {
     Inventory inventory;
     ItemStack item;
     ItemStack bookItem;
+    ConfigData configData;
 
 
-    public LevelMenu(ItemStack item, ItemStack bookItem){
+    public LevelMenu(ItemStack item, ItemStack bookItem, ConfigData configData){
         this.bookItem = bookItem;
+        this.configData = configData;
         this.inventory = Bukkit.createInventory(this, 54, "Enchanting item -> Levels");
        this.item = item.clone();
        build();
@@ -111,12 +115,12 @@ public class LevelMenu implements MenuTable {
                 event.setCancelled(true);
                 switch (slot) {
                     case 45 -> CustomEnchantingTable.instance.getMenu(player).open(player);
-                    case 22 -> applyEnchantment(player, 1);
-                    case 23 -> applyEnchantment(player, 2);
-                    case 24 -> applyEnchantment(player, 3);
-                    case 31 -> applyEnchantment(player, 4);
-                    case 32 -> applyEnchantment(player, 5);
-                    case 33 -> applyEnchantment(player, 6);
+                    case 22 -> applyEnchantment(player, 1, configData.getEnchantments().get(0).getCostExp().get(0));
+                    case 23 -> applyEnchantment(player, 2, configData.getEnchantments().get(1).getCostExp().get(1));
+                    case 24 -> applyEnchantment(player, 3, configData.getEnchantments().get(2).getCostExp().get(2));
+                    case 31 -> applyEnchantment(player, 4, configData.getEnchantments().get(3).getCostExp().get(3));
+                    case 32 -> applyEnchantment(player, 5, configData.getEnchantments().get(4).getCostExp().get(4));
+                    case 33 -> applyEnchantment(player, 6, configData.getEnchantments().get(5).getCostExp().get(5));
                 }
             }
 
@@ -125,12 +129,22 @@ public class LevelMenu implements MenuTable {
 
     }
 
-    private void applyEnchantment(Player player, int level) {
+    private void applyEnchantment(Player player, int level, int costEnchant) {
         EnchantmentStorageMeta bookMeta = (EnchantmentStorageMeta) bookItem.getItemMeta();
         if (bookMeta.getStoredEnchants().isEmpty()) return;
 
         Map.Entry<Enchantment, Integer> entry = bookMeta.getStoredEnchants().entrySet().iterator().next();
         Enchantment enchant = entry.getKey();
+
+        BuyEnchantManager buyEnchantManager = new BuyEnchantManager();
+        int exp = buyEnchantManager.getExp(player);
+        if(exp < costEnchant){
+            player.sendMessage("У вас недостаточно опыта");
+            return;
+        }
+
+        buyEnchantManager.removeExp(player, costEnchant);
+
 
         ItemMeta meta = item.getItemMeta();
         meta.addEnchant(enchant, level, true);

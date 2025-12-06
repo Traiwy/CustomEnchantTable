@@ -13,7 +13,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import ru.traiwy.customEnchantingTable.CustomEnchantingTable;
+
+import ru.traiwy.customEnchantingTable.data.ConfigData;
 import ru.traiwy.customEnchantingTable.gui.inv.main.EnchantLevelManager;
 import ru.traiwy.customEnchantingTable.gui.inv.main.MainMenu;
 import ru.traiwy.customEnchantingTable.util.BookshelfPowerCalculator;
@@ -25,6 +26,7 @@ public class EnchantTableOpenListener implements Listener {
     BookshelfPowerCalculator calculator;
     JavaPlugin plugin;
     EnchantLevelManager manager;
+    ConfigData configData;
 
     private final Random random = new Random();
 
@@ -37,14 +39,16 @@ public class EnchantTableOpenListener implements Listener {
         final Location locBlock = block.getLocation();
 
         int countBookShelf = calculator.calculatePower(locBlock);
+        Bukkit.getLogger().info("Сила: " + countBookShelf);
         int levelTable =  randomLevelTable(countBookShelf);
+        Bukkit.getLogger().info("Уровень: " + levelTable);
 
         manager.setTableData(levelTable, countBookShelf);
 
         event.setCancelled(true);
 
         Player player = event.getPlayer();
-        MainMenu mainMenu = new MainMenu(plugin, null);
+        MainMenu mainMenu = new MainMenu(plugin, null, configData);
         mainMenu.open(player, levelTable, countBookShelf);
     }
 
