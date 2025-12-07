@@ -17,6 +17,8 @@ import ru.traiwy.customEnchantingTable.CustomEnchantingTable;
 import ru.traiwy.customEnchantingTable.data.ConfigData;
 import ru.traiwy.customEnchantingTable.gui.MenuTable;
 import ru.traiwy.customEnchantingTable.gui.inv.main.MainMenu;
+import ru.traiwy.customEnchantingTable.gui.inv.main.item.ItemMenuManager;
+import ru.traiwy.customEnchantingTable.gui.inv.main.item.MenuManager;
 import ru.traiwy.customEnchantingTable.manager.BuyEnchantManager;
 import ru.traiwy.customEnchantingTable.util.ItemUtil;
 
@@ -43,12 +45,16 @@ public class LevelMenu implements MenuTable {
     ItemStack bookItem;
     ConfigData configData;
     Player player;
+    ItemMenuManager itemMenuManager;
+    MenuManager menuManager;
 
 
-    public LevelMenu(ItemStack bookItem, ConfigData configData, Player player) {
+    public LevelMenu(ItemStack bookItem, ConfigData configData, Player player, ItemMenuManager itemMenuManager, MenuManager menuManager) {
         this.bookItem = bookItem;
         this.configData = configData;
         this.player = player;
+        this.itemMenuManager = itemMenuManager;
+        this.menuManager = menuManager;
         this.inventory = Bukkit.createInventory(this, 54, "Чародейский стол -> Уровни");
         build();
     }
@@ -95,7 +101,7 @@ public class LevelMenu implements MenuTable {
         }
 
 
-        ItemStack item = CustomEnchantingTable.getInstance().getItem(player);
+        ItemStack item = itemMenuManager.getItem(player);
         inventory.setItem(MainMenu.ITEM_SLOT, item);
     }
 
@@ -140,7 +146,7 @@ public class LevelMenu implements MenuTable {
     }
 
     private void applyEnchantment(Player player, int level, int costEnchant) {
-        ItemStack item = CustomEnchantingTable.getInstance().getItem(player);
+        ItemStack item = itemMenuManager.getItem(player);
 
         EnchantmentStorageMeta bookMeta = (EnchantmentStorageMeta) bookItem.getItemMeta();
         if (bookMeta.getStoredEnchants().isEmpty()) return;
@@ -161,11 +167,11 @@ public class LevelMenu implements MenuTable {
         meta.addEnchant(enchant, level, true);
         item.setItemMeta(meta);
 
-        MainMenu menu = CustomEnchantingTable.instance.getMenu(player);
-        CustomEnchantingTable.getInstance().setItem(player, item);
+        MenuTable menu = menuManager.getMenu(player);
+        itemMenuManager.setItem(player, item);
         player.sendMessage("item" + item);
         menu.open(player);
 
-        CustomEnchantingTable.getInstance().removeItem(player);
+        itemMenuManager.removeItem(player);
     }
 }

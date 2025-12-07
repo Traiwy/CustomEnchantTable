@@ -15,6 +15,8 @@ import ru.traiwy.customEnchantingTable.CustomEnchantingTable;
 import ru.traiwy.customEnchantingTable.data.ConfigData;
 import ru.traiwy.customEnchantingTable.gui.MenuTable;
 import ru.traiwy.customEnchantingTable.gui.inv.LevelMenu;
+import ru.traiwy.customEnchantingTable.gui.inv.main.item.ItemMenuManager;
+import ru.traiwy.customEnchantingTable.gui.inv.main.item.MenuManager;
 import ru.traiwy.customEnchantingTable.util.ItemUtil;
 
 import java.util.HashMap;
@@ -43,12 +45,16 @@ public class MainMenu implements MenuTable {
     private int currentLevel;
     private int bookshelfCount;
     private final ConfigData configData;
+    private final ItemMenuManager itemMenuManager;
+    private final MenuManager menuManager;
 
     private static final int[] materialAir = {12, 13, 14, 15, 16, 21, 22, 23, 24, 25, 30, 31, 32, 33, 34, 39, 40, 41, 42, 43};
 
-    public MainMenu(JavaPlugin plugin, ConfigData configData) {
+    public MainMenu(JavaPlugin plugin, ConfigData configData, ItemMenuManager itemMenuManager, MenuManager menuManager) {
         this.plugin = plugin;
         this.configData = configData;
+        this.itemMenuManager = itemMenuManager;
+        this.menuManager = menuManager;
         inventory = Bukkit.createInventory(this, 54, "Чародейский стол");
     }
 
@@ -118,7 +124,7 @@ public class MainMenu implements MenuTable {
     }
 
     public void open(Player player) {
-        ItemStack saved = CustomEnchantingTable.instance.getItem(player);
+        ItemStack saved = itemMenuManager.getItem(player);
         player.sendMessage("item" + saved);
         inventory.setItem(ITEM_SLOT, saved);
 
@@ -141,7 +147,7 @@ public class MainMenu implements MenuTable {
             switch (slot){
                 case 49 -> player.closeInventory();
                 case 50 -> {
-                    CustomEnchantingTable.getInstance().setMenu(player, this);
+                    menuManager.setMenu(player, this);
                     player.openInventory(CustomEnchantingTable.getInstance().getGuideMenu().getInventory());
                     return;
                 }
@@ -167,13 +173,13 @@ public class MainMenu implements MenuTable {
             }
 
             if (clickedItem != null && clickedItem.getType() == Material.ENCHANTED_BOOK) {
-                CustomEnchantingTable.getInstance().setItem(player, itemInBookSlot);
-                LevelMenu levelMenu = new LevelMenu(clickedItem, configData, player);
+                itemMenuManager.setItem(player, itemInBookSlot);
+                LevelMenu levelMenu = new LevelMenu(clickedItem, configData, player, itemMenuManager, menuManager);
                 Inventory levelInv = levelMenu.getInventory();
-
-                CustomEnchantingTable.getInstance().setMenu(player, this);
-                enchantLevelManager.updateDyeLevels(clickedItem, levelInv);
-                levelMenu.open(player);
+                menuManager.setMenu(player, this);
+               menuManager.setMark(player);
+               enchantLevelManager.updateDyeLevels(clickedItem, levelInv);
+               levelMenu.open(player);
             }
         });
     }

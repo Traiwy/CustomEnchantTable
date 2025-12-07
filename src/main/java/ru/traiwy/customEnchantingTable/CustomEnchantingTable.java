@@ -1,8 +1,6 @@
 package ru.traiwy.customEnchantingTable;
 
 import lombok.Getter;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import ru.traiwy.customEnchantingTable.command.GiveCommand;
 import ru.traiwy.customEnchantingTable.data.ConfigData;
@@ -12,14 +10,11 @@ import ru.traiwy.customEnchantingTable.gui.ClickService;
 import ru.traiwy.customEnchantingTable.gui.inv.GuideMenu;
 import ru.traiwy.customEnchantingTable.gui.inv.main.EnchantLevelManager;
 import ru.traiwy.customEnchantingTable.gui.inv.main.EnchantManager;
-import ru.traiwy.customEnchantingTable.gui.inv.main.MainMenu;
+import ru.traiwy.customEnchantingTable.gui.inv.main.item.ItemMenuManager;
+import ru.traiwy.customEnchantingTable.gui.inv.main.item.MenuManager;
 import ru.traiwy.customEnchantingTable.manager.ConfigManager;
 import ru.traiwy.customEnchantingTable.manager.ItemManager;
 import ru.traiwy.customEnchantingTable.util.BookshelfPowerCalculator;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 @Getter
 public final class CustomEnchantingTable extends JavaPlugin {
@@ -30,6 +25,8 @@ public final class CustomEnchantingTable extends JavaPlugin {
     private GuideMenu guideMenu;
     private EnchantLevelManager enchantLevelManager;
     private EnchantManager enchantManager;
+    private ItemMenuManager itemMenuManager;
+    private MenuManager menuManager;
 
 
     @Override
@@ -39,18 +36,20 @@ public final class CustomEnchantingTable extends JavaPlugin {
          final ConfigData configData = configManager.getConfigData();
         enchantLevelManager = new EnchantLevelManager(configData);
         enchantManager = new EnchantManager();
+        itemMenuManager = new ItemMenuManager();
+        menuManager = new MenuManager();
 
 
-        this.guideMenu = new GuideMenu(configData);
+        this.guideMenu = new GuideMenu(configData, menuManager);
 
         final ItemManager itemManager = new ItemManager();
         final BookshelfPowerCalculator calculator = new BookshelfPowerCalculator();
 
 
 
-        getServer().getPluginManager().registerEvents(new EnchantTableOpenListener(calculator, this, enchantLevelManager, configData), this);
+        getServer().getPluginManager().registerEvents(new EnchantTableOpenListener(calculator, this, enchantLevelManager, configData, itemMenuManager, menuManager), this);
         getServer().getPluginManager().registerEvents(new ClickService(), this);
-        //getServer().getPluginManager().registerEvents(new InventoryCloseListener(), this);
+        getServer().getPluginManager().registerEvents(new InventoryCloseListener(itemMenuManager, menuManager), this);
         getServer().getPluginManager().registerEvents(guideMenu, this);
         getCommand("giveTable").setExecutor(new GiveCommand(itemManager));
 
@@ -61,30 +60,4 @@ public final class CustomEnchantingTable extends JavaPlugin {
     public void onDisable() {
     }
 
-    private final Map<UUID, MainMenu> menus = new HashMap<>();
-
-    public MainMenu getMenu(Player p) {
-        return menus.get(p.getUniqueId());
-    }
-
-    public void setMenu(Player p, MainMenu menu) {
-        menus.put(p.getUniqueId(), menu);
-
-    }
-
-
-    private final Map<UUID, ItemStack> items = new HashMap<>();
-
-    public void setItem(Player player, ItemStack item) {
-        if (item == null) return;
-        items.put(player.getUniqueId(), item);
-    }
-
-    public ItemStack getItem(Player player) {
-        return items.get(player.getUniqueId());
-    }
-
-    public void removeItem(Player player) {
-        items.remove(player.getUniqueId());
-    }
 }
