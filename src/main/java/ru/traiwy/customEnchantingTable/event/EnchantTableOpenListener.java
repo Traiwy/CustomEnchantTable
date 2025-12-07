@@ -36,6 +36,7 @@ public class EnchantTableOpenListener implements Listener {
 
     @EventHandler
     public void  EnchantTableOpen(PlayerInteractEvent event) {
+
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
         final Block block = event.getClickedBlock();
@@ -52,6 +53,7 @@ public class EnchantTableOpenListener implements Listener {
         event.setCancelled(true);
 
         Player player = event.getPlayer();
+
         MainMenu mainMenu = new MainMenu(plugin, configData, itemMenuManager, menuManager);
         mainMenu.open(player, levelTable, countBookShelf);
     }

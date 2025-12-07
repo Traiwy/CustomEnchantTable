@@ -13,7 +13,7 @@ public class MenuManager {
         return menus.get(player.getUniqueId());
     }
     public void setMenu(Player player, MainMenu menu){
-          menus.put(player.getUniqueId(), menu);
+        menus.put(player.getUniqueId(), menu);
     }
 
     public void setMark(Player player){

@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import ru.traiwy.customEnchantingTable.CustomEnchantingTable;
 import ru.traiwy.customEnchantingTable.data.ConfigData;
 import ru.traiwy.customEnchantingTable.gui.MenuTable;
+import ru.traiwy.customEnchantingTable.gui.inv.GuideMenu;
 import ru.traiwy.customEnchantingTable.gui.inv.LevelMenu;
 import ru.traiwy.customEnchantingTable.gui.inv.main.item.ItemMenuManager;
 import ru.traiwy.customEnchantingTable.gui.inv.main.item.MenuManager;
@@ -147,9 +148,10 @@ public class MainMenu implements MenuTable {
             switch (slot){
                 case 49 -> player.closeInventory();
                 case 50 -> {
+                    menuManager.setMark(player);
                     menuManager.setMenu(player, this);
                     player.openInventory(CustomEnchantingTable.getInstance().getGuideMenu().getInventory());
-                    return;
+
                 }
             }
         }

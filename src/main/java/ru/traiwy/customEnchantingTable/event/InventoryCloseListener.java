@@ -18,28 +18,15 @@ import ru.traiwy.customEnchantingTable.gui.inv.main.item.MenuManager;
 public class InventoryCloseListener implements Listener {
     private final ItemMenuManager manager;
     private final MenuManager menuManager;
-    public static int count = 0;
 
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
-        count++;
-        Bukkit.getLogger().info("Ивент: " + count);
-
 
         Inventory inventory = event.getInventory();
-        if (inventory.getHolder() instanceof MainMenu) {
-             Bukkit.getLogger().info("MainMenu");
-        } else if (inventory.getHolder() instanceof LevelMenu) {
-            Bukkit.getLogger().info("LevelMenu");
-        }
 
         Player player = (Player) event.getPlayer();
-        if (menuManager.isSwitching(player)) {
-            player.sendMessage("метка есть 2");
-            return;
-        }
+        if (menuManager.isSwitching(player)) return;
 
-        player.sendMessage("метка есть 3");
         if (!(inventory.getHolder() instanceof MainMenu || inventory.getHolder() instanceof LevelMenu)) return;
         menuManager.removeMenu(player);
 

@@ -11,6 +11,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.eclipse.sisu.launch.Main;
 import org.jetbrains.annotations.NotNull;
 import ru.traiwy.customEnchantingTable.data.ConfigData;
 import ru.traiwy.customEnchantingTable.gui.MenuTable;
@@ -106,6 +107,11 @@ public class GuideMenu implements InventoryHolder, Listener {
         return String.format("(%d/2)  Справочник зачарований", currentPage + 1);
     }
 
+    public void openFromMainMenu(Player player, MainMenu mainMenu) {
+        manager.setMenu(player, mainMenu);
+        player.openInventory(inventory);
+    }
+
     private void placePageItems() {
         final int start = currentPage * itemsPage;
         final int end = Math.min(start + itemsPage, enchantBooks.size());
@@ -157,7 +163,7 @@ public class GuideMenu implements InventoryHolder, Listener {
             }
 
             case 53 -> {
-                MenuTable mainMenu = manager.getMenu(player);
+                MainMenu mainMenu = manager.getMenu(player);
                 player.openInventory(mainMenu.getInventory());
             }
         }
