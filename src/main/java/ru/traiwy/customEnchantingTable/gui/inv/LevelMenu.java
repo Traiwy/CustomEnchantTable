@@ -167,6 +167,8 @@ public class LevelMenu implements MenuTable {
         meta.addEnchant(enchant, level, true);
         item.setItemMeta(meta);
 
+        menuManager.setMark(player);
+
         MenuTable menu = menuManager.getMenu(player);
         itemMenuManager.setItem(player, item);
         player.sendMessage("item" + item);

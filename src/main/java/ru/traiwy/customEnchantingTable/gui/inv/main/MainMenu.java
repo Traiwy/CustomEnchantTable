@@ -178,6 +178,7 @@ public class MainMenu implements MenuTable {
                 Inventory levelInv = levelMenu.getInventory();
                 menuManager.setMenu(player, this);
                menuManager.setMark(player);
+
                enchantLevelManager.updateDyeLevels(clickedItem, levelInv);
                levelMenu.open(player);
             }
