@@ -40,16 +40,16 @@ public class LevelMenu implements MenuTable {
     };
 
     Inventory inventory;
-    ItemStack item;
     ItemStack bookItem;
     ConfigData configData;
+    Player player;
 
 
-    public LevelMenu(ItemStack item, ItemStack bookItem, ConfigData configData) {
+    public LevelMenu(ItemStack bookItem, ConfigData configData, Player player) {
         this.bookItem = bookItem;
         this.configData = configData;
-        this.inventory = Bukkit.createInventory(this, 54, "Enchanting item -> Levels");
-        this.item = item.clone();
+        this.player = player;
+        this.inventory = Bukkit.createInventory(this, 54, "Чародейский стол -> Уровни");
         build();
     }
 
@@ -95,6 +95,7 @@ public class LevelMenu implements MenuTable {
         }
 
 
+        ItemStack item = CustomEnchantingTable.getInstance().getItem(player);
         inventory.setItem(MainMenu.ITEM_SLOT, item);
     }
 
@@ -139,6 +140,8 @@ public class LevelMenu implements MenuTable {
     }
 
     private void applyEnchantment(Player player, int level, int costEnchant) {
+        ItemStack item = CustomEnchantingTable.getInstance().getItem(player);
+
         EnchantmentStorageMeta bookMeta = (EnchantmentStorageMeta) bookItem.getItemMeta();
         if (bookMeta.getStoredEnchants().isEmpty()) return;
 
@@ -154,15 +157,15 @@ public class LevelMenu implements MenuTable {
 
         buyEnchantManager.removeExp(player, costEnchant);
 
-
         ItemMeta meta = item.getItemMeta();
         meta.addEnchant(enchant, level, true);
         item.setItemMeta(meta);
 
-        CustomEnchantingTable.instance.updateItem(player, item);
-
         MainMenu menu = CustomEnchantingTable.instance.getMenu(player);
+        CustomEnchantingTable.getInstance().setItem(player, item);
+        player.sendMessage("item" + item);
         menu.open(player);
 
+        CustomEnchantingTable.getInstance().removeItem(player);
     }
 }

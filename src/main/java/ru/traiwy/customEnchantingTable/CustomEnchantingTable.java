@@ -50,7 +50,7 @@ public final class CustomEnchantingTable extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new EnchantTableOpenListener(calculator, this, enchantLevelManager, configData), this);
         getServer().getPluginManager().registerEvents(new ClickService(), this);
-        getServer().getPluginManager().registerEvents(new InventoryCloseListener(), this);
+        //getServer().getPluginManager().registerEvents(new InventoryCloseListener(), this);
         getServer().getPluginManager().registerEvents(guideMenu, this);
         getCommand("giveTable").setExecutor(new GiveCommand(itemManager));
 
@@ -69,16 +69,22 @@ public final class CustomEnchantingTable extends JavaPlugin {
 
     public void setMenu(Player p, MainMenu menu) {
         menus.put(p.getUniqueId(), menu);
+
     }
 
 
     private final Map<UUID, ItemStack> items = new HashMap<>();
 
-    public void updateItem(Player player, ItemStack item) {
-        items.put(player.getUniqueId(), item.clone());
+    public void setItem(Player player, ItemStack item) {
+        if (item == null) return;
+        items.put(player.getUniqueId(), item);
     }
 
     public ItemStack getItem(Player player) {
         return items.get(player.getUniqueId());
+    }
+
+    public void removeItem(Player player) {
+        items.remove(player.getUniqueId());
     }
 }

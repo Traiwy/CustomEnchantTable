@@ -42,16 +42,14 @@ public class MainMenu implements MenuTable {
     private final EnchantManager manager = CustomEnchantingTable.getInstance().getEnchantManager();
     private int currentLevel;
     private int bookshelfCount;
-    private final ItemStack targetItem;
     private final ConfigData configData;
 
     private static final int[] materialAir = {12, 13, 14, 15, 16, 21, 22, 23, 24, 25, 30, 31, 32, 33, 34, 39, 40, 41, 42, 43};
 
-    public MainMenu(JavaPlugin plugin, ItemStack targetItem, ConfigData configData) {
+    public MainMenu(JavaPlugin plugin, ConfigData configData) {
         this.plugin = plugin;
-        this.targetItem = targetItem;
         this.configData = configData;
-        inventory = Bukkit.createInventory(this, 54, "Enchanting item");
+        inventory = Bukkit.createInventory(this, 54, "Чародейский стол");
     }
 
     @Override
@@ -121,11 +119,9 @@ public class MainMenu implements MenuTable {
 
     public void open(Player player) {
         ItemStack saved = CustomEnchantingTable.instance.getItem(player);
-        if (saved != null) {
-            inventory.setItem(ITEM_SLOT, saved.clone());
-        } else if (targetItem != null) {
-            inventory.setItem(ITEM_SLOT, targetItem.clone());
-        }
+        player.sendMessage("item" + saved);
+        inventory.setItem(ITEM_SLOT, saved);
+
         player.openInventory(inventory);
     }
 
@@ -171,10 +167,11 @@ public class MainMenu implements MenuTable {
             }
 
             if (clickedItem != null && clickedItem.getType() == Material.ENCHANTED_BOOK) {
-                LevelMenu levelMenu = new LevelMenu(itemInBookSlot, clickedItem, configData);
+                CustomEnchantingTable.getInstance().setItem(player, itemInBookSlot);
+                LevelMenu levelMenu = new LevelMenu(clickedItem, configData, player);
                 Inventory levelInv = levelMenu.getInventory();
+
                 CustomEnchantingTable.getInstance().setMenu(player, this);
-                inventory.setItem(ITEM_SLOT, null);
                 enchantLevelManager.updateDyeLevels(clickedItem, levelInv);
                 levelMenu.open(player);
             }

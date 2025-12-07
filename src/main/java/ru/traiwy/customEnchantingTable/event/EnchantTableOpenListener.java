@@ -48,7 +48,7 @@ public class EnchantTableOpenListener implements Listener {
         event.setCancelled(true);
 
         Player player = event.getPlayer();
-        MainMenu mainMenu = new MainMenu(plugin, null, configData);
+        MainMenu mainMenu = new MainMenu(plugin, configData);
         mainMenu.open(player, levelTable, countBookShelf);
     }
 

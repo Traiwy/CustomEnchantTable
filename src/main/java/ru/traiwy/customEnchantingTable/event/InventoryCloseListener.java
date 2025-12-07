@@ -7,6 +7,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import ru.traiwy.customEnchantingTable.CustomEnchantingTable;
 import ru.traiwy.customEnchantingTable.gui.inv.LevelMenu;
 import ru.traiwy.customEnchantingTable.gui.inv.main.MainMenu;
 
@@ -23,6 +24,7 @@ public class InventoryCloseListener implements Listener {
         ItemStack item = inventory.getItem(slot);
 
 
+        CustomEnchantingTable.getInstance().removeItem(player);
         if (item == null || item.getType() == Material.AIR) return;
 
         player.getWorld().dropItemNaturally(player.getLocation(), item);
